@@ -63,22 +63,30 @@ def main():
     files = [f for f in os.listdir(path) if (os.path.isfile(f) & f.endswith("dat"))]
     print "Total Files Number", len(files)
     LISTA_KRZYWYCH = []
-                    for f in files:
-                        Model1 = letsdoSomeWork(f)
-                        if Model1 is None: break
+    for f in files:
+         Model1 = letsdoSomeWork(f)
+         if Model1 is None: break
 
-                        CheckFlag = CheckIfModelIsGood(Model1)  ####### SPRAWDZA CZY DANA KRZYWA SIE NADAJE
-                        if CheckFlag:
-                            LISTA_KRZYWYCH.append(Model1)
-                            del Model1
-                        else:
-                            print Model1.fileName, "was deleted due to D1: ",Model1.D1
-                    """NOWY KOD"""
+         CheckFlag = CheckIfModelIsGood(Model1)  ####### SPRAWDZA CZY DANA KRZYWA SIE NADAJE
+         if CheckFlag:
+            LISTA_KRZYWYCH.append(Model1)
+            del Model1
+         else:
+            print Model1.fileName, "was deleted due to D1: ",Model1.D1
+    """NOWY KOD"""
     #print "LiczbaOgnisk", len(LISTA_KRZYWYCH)
     print "SSS", len(LISTA_KRZYWYCH)
     GlobalStatisticParam = GlobalStatisticParameters(LISTA_KRZYWYCH)
 
     printStatistic(GlobalStatisticParam)
+
+
+    # LISTA KRZYWYCH to lista. kazdy jej element dane z jednego pliku
+    # oraz element klasy SingleCurveFromFLCS
+
+    #wexzmy sobie jedna krzywa i pobawmy sie nia
+
+    LISTA_KRZYWYCH[0].printCurvewithFit()
 
 
     pass

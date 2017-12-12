@@ -1,6 +1,11 @@
+import matplotlib
+import matplotlib.pyplot as plt
+import os
 
+path = os.getcwd()
 
 class SingleCurveFromFLCS(object):
+
 
     def __init__(self,name,filelines):
         self.fileName = name
@@ -61,6 +66,24 @@ class SingleCurveFromFLCS(object):
             except IndexError:
                 tempList.append(0)
         return tempList
+
+    def printCurvewithFit(self):
+        tau = self.time_List
+        G = self.Ex_Corr_List
+        GFit = self.Fit_Corr_List
+        title = self.fileName
+
+        plt.plot(tau,G,"b", label = "raw data")
+        plt.plot(tau,GFit,"r", label = "fit model")
+        plt.xscale('log', nonposy='clip')
+
+        plt.xlabel(r"$\tau$ "+  u"[\u00B5sec]", fontsize = 18)
+        plt.ylabel(r"G($\tau$) "+title, fontsize=18)
+        plt.legend(  bbox_to_anchor=(0.8, 1), fancybox=True, shadow=True)
+
+        plt.grid(True)
+        plt.savefig(os.path.join(path, "AverageNormalizeFCSCurve %s.png" %(title)))
+        matplotlib.pyplot.clf()
 
 
 

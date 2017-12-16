@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import os
+
+
+path = os.getcwd()
 
 class FIT:
 
@@ -54,6 +58,30 @@ class FIT:
         
 
 
+def printNormalizedAverageCurve(tau, G, GFit=None, title=None):
+    plt.plot(tau,G,"b", label = "raw data")
+    try:
+        plt.plot(tau,GFit,"r", label = "fit model")
+    except ValueError:
+        pass
+
+    plt.xscale('log', nonposy='clip')
+
+    plt.xlabel(r"$\tau$ "+  u"[\u00B5sec]", fontsize = 18)
+    plt.ylabel(r"G($\tau$) "+title, fontsize=18)
+    plt.legend(  bbox_to_anchor=(0.8, 1), fancybox=True, shadow=True)
+
+    plt.grid(True)
+    plt.savefig(os.path.join(path, "AverageNormalizeFCSCurve %s.png" %(title)))
+    plt.clf()
+
+def printResults(F):
+        print "T: ", F[0][0], " +/- ", F[1][0]
+        print "Tt: ", F[0][1], " +/- ", F[1][1]
+        print "T1: ", F[0][2], " +/- ", F[1][2]
+        print "N: ", F[0][3], " +/- ", F[1][3]
+
+
 if __name__ == '__main__':
     
 ####### test
@@ -64,14 +92,43 @@ if __name__ == '__main__':
     Y =  [0.0035, 0.0037, 0.0006, 0.0034, -0.0016, 0.0004, 0.0033, 0.0025, 0.0101, 0.002, 0.0, 0.0054, 0.0021, 0.0046, 0.0032, 0.0067, 0.005, 0.0034, 0.0079, 0.0039, 0.0026, 0.002, 0.0068, 0.0052, 0.0031, 0.0036, 0.0068, 0.0006, 0.0018, 0.0027, 0.0038, 0.0038, 0.0045, 0.0005, 0.0024, 0.0051, 0.0033, 0.0027, 0.0009, 0.0024, 0.0014, -0.0004, 0.002, 0.0012, 0.0025, 0.0007, 0.0017, 0.002, 0.0011, 0.0018, 0.0014, 0.0009, 0.001, 0.001, 0.001, 0.0007, 0.0005, 0.0002, 0.0017, 0.0008, 0.0008, 0.0001, 0.0002, -0.0003, 0.0009, 0.0006, 0.0002, 0.0006, 0.0002, 0.0002, 0.0004, 0.0004, 0.0001, 0.0, 0.0001, 0.0, 0.0001, 0.0001, 0.0001, 0.0, 0.0, 0.0, -0.0002, 0.0, -0.0001, -0.0004, -0.0003, -0.0005, -0.0003, -0.0003, -0.0004, -0.0002, -0.0003, -0.0005, -0.0006, -0.0006, -0.0007, -0.0007, -0.0007, -0.0007, -0.0005, -0.0007, -0.0009, -0.0007, -0.0009, -0.0007]
 
     F=FIT(X,Y).wykonaj()
-    
-    print "T: ", F[0][0], " +/- ", F[1][0]
-    print "Tt: ", F[0][1], " +/- ", F[1][1]
-    print "T1: ", F[0][2], " +/- ", F[1][2]
-    print "N: ", F[0][3], " +/- ", F[1][3]
-    print ""
-    print "x", "y", "fit_y"
-    for i in range(len(X)):
-        print X[i], Y[i],F[2][i]
+
+
+    printNormalizedAverageCurve(X,Y,F[2] ,title="takiego")
+
+
+    #SILNIK FITOWANIA:
+    rangeStart = 50
+    rangeStep = 20
+    paramT = 0.5
+    paramTt = 0.5
+    paramT1 = 0.5
+    paramN = 0.5
+    n = 1
+    while rangeStart < len(X):
+        print "Ineracja numer ", n
+        #self, X, Y, initT=0.5, initTt=0.5, initT1=0.5, initN=0.5
+        H = FIT(X[-rangeStart:],Y[-rangeStart:],initT=paramT,initTt=paramTt,initT1=paramT1,initN=paramN).wykonaj()  # F consists: [[self.T,self.Tt,self.T1, self.N],[self.errT, self.errTt, self.errT1, self.N],self.fitY]
+        paramT = H[0][0]
+        paramTt = H[0][1]
+        paramT1 = H[0][2]
+        paramN = H[0][3]
+        rangeStart = rangeStart+rangeStep
+        n = n+1
+        printResults(H)
+
+    printNormalizedAverageCurve(X,Y,H[2] ,title="NewEngine")
+
+
+    print "Pojedyczna Interacja"
+    printResults(F)
+    print "fragmentowa Analiza "
+    printResults(H)
+
+
+    #print ""
+    #print "x", "y", "fit_y"
+    #for i in range(len(X)):
+    #    print X[i], Y[i],F[2][i]
     
     

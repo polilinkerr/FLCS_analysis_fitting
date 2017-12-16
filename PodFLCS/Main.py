@@ -86,8 +86,6 @@ def main():
 
     #wexzmy sobie jedna krzywa i pobawmy sie nia
 
-    LISTA_KRZYWYCH[0].printCurvewithFit()
-
 
     pass
 

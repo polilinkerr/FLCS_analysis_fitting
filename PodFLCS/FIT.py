@@ -47,10 +47,12 @@ class FIT:
         self.errT1=perr[2]
         self.errN=perr[3]
         self.fitY=[self.funkcja(x,self.T, self.Tt, self.T1, self.N) for x in X] #wyznacza igreki dopasowania
+        self.r=self.Y-self.funkcja(self.X, *fit[0])
+        self.chisq = sum ((self.r / 1) ** 2)
         return 0
 
     def referuj(self):
-        return[[self.T,self.Tt,self.T1, self.N],[self.errT, self.errTt, self.errT1, self.N],self.fitY]
+        return[[self.T,self.Tt,self.T1, self.N],[self.errT, self.errTt, self.errT1, self.N],self.fitY, self.chisq]
 
     def wykonaj(self):
         self.fitowanie()
@@ -60,16 +62,19 @@ class FIT:
 
 def printNormalizedAverageCurve(tau, G, GFit=None, title=None):
     plt.plot(tau,G,"b", label = "raw data")
+    chisq=None
     try:
         plt.plot(tau,GFit,"r", label = "fit model")
+        chisq = sum(map(lambda x,y: (x-y)**2, G, GFit))
     except ValueError:
         pass
 
     plt.xscale('log', nonposy='clip')
 
-    plt.xlabel(r"$\tau$ "+  u"[\u00B5sec]", fontsize = 18)
+    plt.xlabel(r"$\tau$ "+  "[msec]", fontsize = 18)
     plt.ylabel(r"G($\tau$) "+title, fontsize=18)
-    plt.legend(  bbox_to_anchor=(0.8, 1), fancybox=True, shadow=True)
+    plt.legend(  bbox_to_anchor=(0.9, 1), fancybox=True, shadow=True)
+    plt.text(1, 0.008, u'chisq = %.5f' %(chisq))
 
     plt.grid(True)
     plt.savefig(os.path.join(path, "AverageNormalizeFCSCurve %s.png" %(title)))
@@ -80,6 +85,7 @@ def printResults(F):
         print "Tt: ", F[0][1], " +/- ", F[1][1]
         print "T1: ", F[0][2], " +/- ", F[1][2]
         print "N: ", F[0][3], " +/- ", F[1][3]
+        print "chi squared: ", F[3]
 
 
 if __name__ == '__main__':

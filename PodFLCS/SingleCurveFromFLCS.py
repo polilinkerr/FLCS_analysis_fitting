@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 path = os.getcwd()
 
@@ -64,25 +65,30 @@ class SingleCurveFromFLCS(object):
             try:
                 tempList.append(float(values[column].replace(",",".")))
             except IndexError:
-                tempList.append(0)
+                tempList.append(np.nan)
         return tempList
 
-    def printCurvewithFit(self):
+    def printCurvewithFit(self):    ##podglad pojedynczej krzywej z fitem
         tau = self.time_List
         G = self.Ex_Corr_List
         GFit = self.Fit_Corr_List
-        title = self.fileName
-
+        title = self.fileName[-35:-4]
+        N = self.N
+        D1 =self.D1
+        r1 =self.r1
+        
         plt.plot(tau,G,"b", label = "raw data")
         plt.plot(tau,GFit,"r", label = "fit model")
         plt.xscale('log', nonposy='clip')
+        plt.ylim(-0.03, 0.05)
 
-        plt.xlabel(r"$\tau$ "+  u"[\u00B5sec]", fontsize = 18)
+        plt.xlabel(r"$\tau$ "+  "[msec]", fontsize = 18)
         plt.ylabel(r"G($\tau$) "+title, fontsize=18)
-        plt.legend(  bbox_to_anchor=(0.8, 1), fancybox=True, shadow=True)
-
+        plt.legend(  bbox_to_anchor=(0.9, 1), fancybox=True, shadow=True)
+        plt.text(1, 0.025, u' <N> = %d \n D1 = %.2f $\mu $$m^2$/s \n r1 = %.4f' %(N, D1, r1))
+        
         plt.grid(True)
-        plt.savefig(os.path.join(path, "AverageNormalizeFCSCurve %s.png" %(title)))
+        plt.savefig(os.path.join(path, "FCSCurve_SPT_fit %s.png" %(title)))
         matplotlib.pyplot.clf()
 
 
@@ -118,6 +124,7 @@ class GlobalStatisticParameters():
         self.Fit_Corr_List_Global = []
         self.Residuals_List_Global = []
         self.Obliczanie2(ListaKrzywych)
+        self.Obliczanie3(self)
 
     def Obliczenia(self, ListaKrzywych):
         for krzywa in ListaKrzywych:
@@ -142,3 +149,41 @@ class GlobalStatisticParameters():
             self.Fit_Corr_List_Global.append(krzywa.Fit_Corr_List)
             self.Residuals_List_Global.append(krzywa.Residuals_List)
         pass
+    
+    def Obliczanie3(self, ListaKrzywych):       ## usrednianie krzywych bez poprawki na rozne G(0)
+        self.time_List_Global_Avg = np.nanmean(np.transpose(self.time_List_Global), axis=1).tolist()
+        self.Ex_Corr_List_Global_Avg = np.nanmean(np.transpose(self.Ex_Corr_List_Global), axis=1).tolist()
+        self.Fit_Corr_List_Global_Avg = np.nanmean(np.transpose(self.Fit_Corr_List_Global), axis=1).tolist()
+        self.Residuals_List_Global_Avg = np.nanmean(np.transpose(self.Residuals_List_Global), axis=1).tolist()
+        pass
+
+    
+
+    def printAverageCurveWithFit (self):        ## podglad usrednionej krzywej fitu
+
+        tau = self.time_List_Global_Avg
+        G = self.Ex_Corr_List_Global_Avg
+        GFit = self.Fit_Corr_List_Global_Avg
+        N = np.nanmean(self.NList)
+        D1 =np.nanmean(self.D1List)
+        r1 =np.nanmean(self.r1List)
+        std_N = np.std(self.NList)
+        std_D1 =np.std(self.D1List)
+        std_r1 =np.std(self.r1List)
+
+
+        plt.plot(tau,G,"b", label = "raw data")
+        plt.plot(tau,GFit,"r", label = "fit model")
+        plt.xscale('log', nonposy='clip')
+        plt.ylim(-0.005, 0.015)
+
+        plt.xlabel(r"$\tau$ "+  "[msec]", fontsize = 18)
+        plt.ylabel(r"G($\tau$) ", fontsize=18)
+        plt.legend(  bbox_to_anchor=(0.9, 1), fancybox=True, shadow=True)
+        text_label = u' <N> = %d +/- %d\n D1 = %.2f +/- %.2f $\mu $$m^2$/s \n r1 = %.2f +/- %.2f'%(N, std_N, D1, std_D1, r1, std_r1)
+        plt.text(1,0.005, text_label )
+
+        plt.grid(True)
+        plt.savefig(os.path.join(path, "AverageFCSCurve.png"))
+        matplotlib.pyplot.clf()
+    

@@ -76,17 +76,25 @@ def main():
     """NOWY KOD"""
     #print "LiczbaOgnisk", len(LISTA_KRZYWYCH)
     print "SSS", len(LISTA_KRZYWYCH)
+    #for f in LISTA_KRZYWYCH:
+    #    print f.fileName, len(f.time_List)
+
+    # ponizej podglad pojedynczych krzywych z fitami
+    #for f in LISTA_KRZYWYCH:
+    #    f.printCurvewithFit()
+
+    
     GlobalStatisticParam = GlobalStatisticParameters(LISTA_KRZYWYCH)
 
     printStatistic(GlobalStatisticParam)
-
-
+    GlobalStatisticParam.printAverageCurveWithFit()
+    
     # LISTA KRZYWYCH to lista. kazdy jej element dane z jednego pliku
     # oraz element klasy SingleCurveFromFLCS
 
     #wexzmy sobie jedna krzywa i pobawmy sie nia
 
-    LISTA_KRZYWYCH[0].printCurvewithFit()
+    #LISTA_KRZYWYCH[0].printCurvewithFit()
 
 
     pass

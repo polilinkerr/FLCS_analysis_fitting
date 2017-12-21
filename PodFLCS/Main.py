@@ -59,12 +59,15 @@ def CheckIfModelIsGood(Model1):
     if Model1.D1 < 50. and  Model1.D1>10.:
         flag = True
     return flag
+
+
+##CORE##
 def main():
     files = [f for f in os.listdir(path) if (os.path.isfile(f) & f.endswith("dat"))]
     print "Total Files Number", len(files)
     LISTA_KRZYWYCH = []
     for f in files:
-         Model1 = letsdoSomeWork(f)
+         Model1 = letsdoSomeWork(f) # zwraca obiekt SingleCurveFLCS_TripletModelOneSpecies
          if Model1 is None: break
 
          CheckFlag = CheckIfModelIsGood(Model1)  ####### SPRAWDZA CZY DANA KRZYWA SIE NADAJE
